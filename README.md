@@ -83,7 +83,3 @@ This project demonstrates real-world web development workflows, including secure
 - **Email notifications** for order confirmation
 - Production-ready and **scalable architecture**
 
----
-
-## 📂 Project Structure (Simplified)
-
