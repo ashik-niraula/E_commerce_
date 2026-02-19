@@ -7,7 +7,7 @@
 A **full-featured e-commerce web application** built with **Django** and **Django REST Framework**, featuring **OTP-based authentication**, **cart & order management**, **shipping system**, and **payment gateway integration** with **eSewa** and **PayPal**.  
 This project demonstrates real-world web development workflows, including secure REST APIs, dynamic cart/order processing, and payment verification.
 
-Live Demo: [![Django](https://static.vecteezy.com/system/resources/thumbnails/006/689/643/small/live-demo-teaching-demonstrate-concept-button-icon-label-design-free-vector.jpg)](https://radhapiya.pythonanywhere.com/)
+Live Demo: [![Django](https://cdn-icons-png.flaticon.com/128/5511/5511365.png)](https://radhapiya.pythonanywhere.com/)
 
 ---
 
