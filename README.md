@@ -1,90 +1,89 @@
-Django E-Commerce Platform
-Author: [Ashik Niraula]
+# 🛒 Django E-Commerce Platform
 
-PROJECT DESCRIPTION
+[![Python](https://img.shields.io/badge/python-3.11-blue)](https://www.python.org/)
+[![Django](https://img.shields.io/badge/django-4.2-green)](https://www.djangoproject.com/)
+[![License](https://img.shields.io/badge/license-MIT-orange)](LICENSE)
 
-This is a full-featured E-commerce web application built using Django and Django REST Framework. The project includes authentication with OTP verification, cart management, order processing, shipping system, and online payment integration using eSewa and PayPal.
+A **full-featured e-commerce web application** built with **Django** and **Django REST Framework**, featuring **OTP-based authentication**, **cart & order management**, **shipping system**, and **payment gateway integration** with **eSewa** and **PayPal**.  
 
-FEATURES
+This project demonstrates real-world web development workflows, including secure REST APIs, dynamic cart/order processing, and payment verification.
 
-Authentication System
+---
 
-User registration with OTP email verification
+## 🚀 Features
 
-Login and logout system
+### 🔐 Authentication
+- User registration with **OTP email verification**
+- Secure login & logout
+- Profile management with contact info and bio
 
-Role-based accounts (Customer / Vendor)
+### 🛍 Product Management
+- Product listing & detailed view
+- Category filtering & search
+- Featured & trending products
+- Related product suggestions
 
-Profile management
+### 🛒 Cart System
+- Add / Remove products via REST API
+- Update product quantity
+- Real-time cart total calculation
+- Authenticated user-specific carts
 
-Product Management
+### 📦 Order & Checkout
+- Create order from cart or **Buy Now**
+- Select shipping options
+- Assign delivery addresses
+- Full **order lifecycle**:
+  - `PENDING` → `PAID` → `SHIPPED` → `DELIVERED` → `CANCELLED` → `DELETED`
 
-Product listing and detail pages
+### 💳 Payment Integration
+- **eSewa** payment gateway
+- **PayPal** integration
+- Payment success & failure handling
+- Automatic order number & invoice generation
+- Email confirmation after successful payment
 
-Category filtering and search
+### 👤 User Dashboard
+- View **recent orders** and order details
+- Update profile information
+- Manage multiple addresses
+- Set **default shipping preference**
 
-Featured and trending products
+### 🔌 REST API Endpoints
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/products/` | GET | List all products |
+| `/api/cart/add_remove/` | POST | Add or remove product in cart |
+| `/api/cart/update_quantity/` | POST | Update quantity of cart item |
+| `/api/order/update_shipping/` | POST | Update shipping option for order |
+| `/api/order/update_address/` | POST | Update order delivery address |
+| `/api/order/cancel/` | POST | Cancel an order |
+| `/api/order/delete/` | POST | Delete an order |
+| `/api/profile/update_shipping/` | POST | Update user shipping preference |
+| `/api/profile/update_address/` | POST | Set default address |
 
-Related product suggestions
+---
 
-Cart System
+## 🛠 Tech Stack
 
-Add and remove products (API-based)
+- **Backend:** Python, Django, Django REST Framework  
+- **Database:** SQLite / PostgreSQL  
+- **Frontend:** HTML, CSS, JavaScript, Bootstrap  
+- **Payment Gateways:** eSewa, PayPal  
+- **Others:** Email notifications, OTP verification, shortuuid for order IDs
 
-Update product quantity
+---
 
-Automatic cart total calculation
+## 💡 Project Highlights
 
-Order & Checkout
+- Clean and modular **Django project structure**
+- **Secure APIs** with authentication
+- Complete **order lifecycle handling**
+- **Payment verification** with signature validation
+- **Email notifications** for order confirmation
+- Production-ready and **scalable architecture**
 
-Create order from cart
+---
 
-Buy Now functionality
+## 📂 Project Structure (Simplified)
 
-Address selection
-
-Shipping option selection
-
-Order status handling (PENDING, PAID, SHIPPED, CANCELLED, DELETED)
-
-Payment Integration
-
-eSewa payment integration
-
-PayPal payment integration
-
-Payment success and failure handling
-
-Order number and invoice generation
-
-Email confirmation after successful payment
-
-User Dashboard
-
-Order history
-
-Order details view
-
-Address management
-
-Shipping preference update
-
-Profile update
-
-TECH STACK
-
-Python
-
-Django
-
-Django REST Framework
-
-SQLite / PostgreSQL
-
-eSewa API
-
-PayPal SDK
-
-HTML, CSS, JavaScript
-
-This project demonstrates a complete E-commerce workflow including authentication, cart system, order lifecycle, payment gateway integration, and REST API development.
