@@ -1,0 +1,159 @@
+{% extends "main/base.html" %}
+
+{% block main %}
+    <style>
+        .otp-container {
+            max-width: 400px;
+            margin: 3rem auto;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .otp-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .otp-message {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+        
+        .otp-input {
+            width: 200px;
+            padding: 1rem;
+            font-size: 1.2rem;
+            text-align: center;
+            margin: 1rem 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        
+        .timer {
+            margin: 1rem 0;
+            color: #ff7675;
+            font-weight: bold;
+        }
+        
+        .resend-btn {
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: not-allowed;
+            margin: 1rem 0;
+        }
+        
+        .resend-btn.active {
+            background: #ff7675;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .verify-btn {
+            background: #ff7675;
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 1rem;
+            width: 200px;
+        }
+    </style>
+
+    <div class="otp-container">
+        <h2 class="otp-title">Enter OTP</h2>
+        <p class="otp-message">Enter the 6-digit code sent to your email</p>
+        <input type="hidden" value={{email}} id="emailid">
+        <form method="POST" id='verifyopt'>
+            {% csrf_token %}
+        <input type="text" 
+               class="otp-input" 
+               maxlength="6" 
+               
+               name="otp">
+        
+        <div class="timer" id="timer">05:00</div>
+        
+        <button class="verify-btn" type="submit">Verify</button>
+        </form>
+          {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-danger" role="alert">
+                {{message}}
+                </div>
+        {% endfor %} 
+        {% endif %} 
+            <br>
+        <button class="resend-btn" id="resendBtn" onclick=  disabled>
+            Resend OTP (5:00)
+        </button>
+        
+    </div>
+
+    <script>
+        // Timer setup
+        let timeLeft = 300; // 5 minutes
+        const timerElement = document.getElementById('timer');
+        const resendBtn = document.getElementById('resendBtn');
+        const otpInput = document.getElementById('otpInput');
+        
+        function updateTimer() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            
+            timerElement.textContent = 
+                `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (timeLeft > 0) {
+                timeLeft--;
+                setTimeout(updateTimer, 1000);
+            } else {
+                resendBtn.disabled = false;
+                resendBtn.classList.add('active');
+                resendBtn.textContent = 'Resend OTP';
+            }
+        }
+        
+        // Start timer
+        updateTimer();
+        
+        // Resend button click
+        resendBtn.onclick = function() {
+            if (!this.disabled) {
+                // Reset timer
+                timeLeft = 300;
+                this.disabled = true;
+                this.classList.remove('active');
+                this.textContent = 'Resend OTP (5:00)';
+                const email = document.getElementById('emailid').value;
+            fetch('api/resend-otp/',{
+                method: "POST",
+                 headers:{
+                "X-CSRFToken": getCSRFToken(),
+                "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    email: email,
+                })
+            });
+            updateTimer();
+            showToast(`Resend the OTP`, "success");
+            }
+        };
+        
+        
+        // Auto submit when 6 digits entered
+        {% comment %} otpInput.addEventListener('input', function() {
+            if (this.value.length === 6 && /^\d+$/.test(this.value)) {
+                var form = document.getElementById("verifyopt");
+                if (form) {
+                form.submit();
+            }
+            }
+        }); {% endcomment %}
+    </script>
+{% endblock main %}

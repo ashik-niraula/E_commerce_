@@ -1,0 +1,640 @@
+{% extends "main/base.html" %}
+
+{% block main %}
+    <main class="section">
+        <div class="container">
+            <div class="checkout-container">
+                <!-- Checkout Progress -->
+                <div class="checkout-progress">
+                    <div class="progress-step completed">
+                        <div class="step-number">1</div>
+                        <div class="step-label">Cart</div>
+                    </div>
+                    <div class="progress-step active">
+                        <div class="step-number">2</div>
+                        <div class="step-label">Information</div>
+                    </div>
+                    <div class="progress-step">
+                        <a href="{% url "payment" order.id %}">
+                        <div class="step-number">3</div>
+                        <div class="step-label">Payment</div>
+                        </a>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-number">4</div>
+                        <div class="step-label">Confirmation</div>
+                    </div>
+                </div>
+                
+                <div class="checkout-content">
+                    <!-- Left Column - Forms -->
+                    <div class="checkout-forms">
+                        <!-- Contact Information Section -->
+                        <div class="checkout-form">
+                            <div class="checkout-section">
+                                <h2 class="section-title">Contact Information</h2>
+                                
+                                <div class="contact-info">
+                                    <!-- Email -->
+                                    <div class="contact-item">
+                                        <div class="contact-icon">
+                                            <i class="fas fa-envelope"></i>
+                                        </div>
+                                        <div class="contact-details">
+                                            <h4>Email Address</h4>
+                                            <p id="userEmail"> {{request.user.email}} </p>
+                                        </div>
+                                       
+                                    </div>
+                                    
+                                    <!-- Phone -->
+                                    <div class="contact-item">
+                                        <div class="contact-icon">
+                                            <i class="fas fa-phone"></i>
+                                        </div>
+                                        <div class="contact-details">
+                                            <h4>Phone Number</h4>
+                                            <p id="userPhone">{{profile.phonenumber}}</p>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group" style="display: none;" id="editEmailForm">
+                                    <label>Email Address</label>
+                                    <div style="display: flex; gap: 1rem;">
+                                        <input type="email" id="emailInput" value="{{profile.user.email}}" style="flex: 1;">
+                                        
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group" style="display: none;" id="editPhoneForm">
+                                    <label>Phone Number</label>
+                                    <div style="display: flex; gap: 1rem;">
+                                        <input type="tel" id="phoneInput" value="{{profile.phonenumber}}" style="flex: 1;">
+                                        <button class="btn btn-primary" onclick="saveContact('phone')">Save</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Shipping Address Section -->
+                            <div class="checkout-section">
+                                <h2 class="section-title">Shipping Address</h2>
+                                
+                                <div class="saved-addresses">
+                                    <!-- Address 1 -->
+                                     {% for address in addresses %}
+                                    <div class="address-card selected" onclick="selectAddress({{address.id}})">
+                                        <div class="address-radio">
+                                            <input type="radio" required="required" name="address" {% if address.is_default %} checked {% elif forloop.first %} checked {% endif %} >
+                                        </div>
+                                        <div class="address-header">
+                                            <div class="address-name"> {{request.user.get_full_name}} </div>
+                                            <span class="address-type"> {{address.get_address_type_display}} </span>
+                                        </div>
+                                        <div class="address-details">
+                                             {{address.address}} <br>
+                                            {{address.landmark}}<br>
+                                             {{address.state}} <br>
+                                            {{address.country}}
+                                        </div>
+                                        <div class="address-phone">
+                                            <i class="fas fa-phone"></i> {{address.profile.phonenumber}}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                   
+                                </div>
+                                
+                                <!-- Add New Address -->
+                                <div class="add-new-address" onclick="window.location.href ='{% url "add_address" %}' ">
+                                    <i class="fas fa-plus"></i> Add New Address
+                                </div>
+                                
+                                <!-- New Address Form -->
+                                {% comment %} <div class="new-address-form" id="newAddressForm">
+                                    <h4 style="margin-bottom: 1rem;">New Address</h4>
+                                    <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                                        <div class="form-group">
+                                            <label>First Name</label>
+                                            <input type="text">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Last Name</label>
+                                            <input type="text">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group" style="margin-bottom: 1rem;">
+                                        <label>Address</label>
+                                        <input type="text" placeholder="Street address">
+                                    </div>
+                                    
+                                    <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                                        <div class="form-group">
+                                            <label>City</label>
+                                            <input type="text">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>ZIP Code</label>
+                                            <input type="text">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group" style="margin-bottom: 1rem;">
+                                        <label>Country</label>
+                                        <select>
+                                            <option>United States</option>
+                                            <option>Canada</option>
+                                            <option>United Kingdom</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group" style="margin-bottom: 1rem;">
+                                        <label>Phone Number</label>
+                                        <input type="tel">
+                                    </div>
+                                    
+                                    <div class="form-group" style="margin-bottom: 1rem;">
+                                        <label>
+                                            <input type="checkbox"> Save this address for future orders
+                                        </label>
+                                    </div>
+                                    
+                                    <div style="display: flex; gap: 1rem;">
+                                        <button class="btn btn-outline" onclick="hideNewAddressForm()">Cancel</button>
+                                        <button class="btn btn-primary">Save Address</button>
+                                    </div>
+                                </div> {% endcomment %}
+                            </div>
+                            
+                            <!-- Shipping Method Section -->
+                            <div class="checkout-section">
+                                <h2 class="section-title">Shipping Method</h2>
+                                
+                                <div class="shipping-methods">
+                                    <!-- Standard Shipping -->
+                                     <input type="hidden" id="order_id" value="{{ order.id }}">
+                                     {% for option in shipping %}
+                                    <div class="shipping-method selected" onclick="selectShipping({{option.id}})">
+                                        <div class="shipping-radio">
+                                            <input type="radio" required = "required" name="shipping"{% if profile.customer.shipping == option %} checked {% elif forloop.first %} checked {% endif %}>
+                                        </div>
+                                        <div class="shipping-details">
+                                            <div class="shipping-time"> {{option.get_shipping_type_display}} </div>
+                                            {% comment %} <div class="shipping-time">3-5 business days</div> {% endcomment %}
+                                        </div>
+                                        <div class="shipping-price"> {{option.price}} </div>
+                                    </div>
+                                    {% endfor %} 
+                                   
+                                </div>
+                            </div>
+                            
+                            <!-- Navigation -->
+                            <div class="checkout-actions">
+                                <a href="{% url "cart" %}" class="btn btn-outline">
+                                    <i class="fas fa-arrow-left"></i> Back to Cart
+                                </a>
+                                <a href="{% url "payment" order.id %}" class="btn btn-primary">
+                                    Continue to Payment <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Column - Order Summary -->
+                    <div class="order-summary">
+                        <h3 style="margin-bottom: 1.5rem;">Order Summary</h3>
+                        
+                        <div class="summary-items">
+                            <!-- Item 1 -->
+                             {% for item in orderitems %}
+                            <div class="summary-item">
+                                <div class="item-image">
+                                    <img src="{{item.product.get_image_url}}" alt="{{item.product.name}}">
+                                </div>
+                                <div class="item-details">
+                                    <div class="item-name"> {{item.product.name}} </div>
+                                    <div class="item-price">${{item.product.price}} </div>
+                                    <div class="item-quantity">Qty:  {{item.quantity}} </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="summary-totals">
+                            <div class="total-row">
+                                <span>Sub Total</span>
+                                <span id="sub_total"> ${{sub_total}} </span>
+                            </div> 
+                            <div class="total-row">
+                                <span>Shipping Type</span>
+                                <span id="shipping_type"> {{order.shipping_price.shipping_type|upper}} </span>
+                            </div> 
+                            <div class="total-row">
+                                <span >Shipping Price</span>
+                                <span id="shipping_price"> ${{order.shipping_price.price}} </span>
+                            </div>
+                            
+                            <div class="total-row grand-total">
+                                <span>Total</span>
+                                <span id="total_amount">${{order.total_amount}} </span>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 1.5rem; padding: 1rem; background: #f9f9f9; border-radius: 8px;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                <i class="fas fa-lock" style="color: #00b894;"></i>
+                                <span style="font-weight: 500;">Secure checkout</span>
+                            </div>
+                            <p style="font-size: 0.9rem; color: #636e72;">Your payment information is encrypted and secure.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <style>
+        .checkout-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .checkout-progress {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+        
+        .checkout-progress::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #dfe6e9;
+            z-index: 1;
+        }
+        
+        .progress-step {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            flex: 1;
+        }
+        
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #dfe6e9;
+            color: #636e72;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .progress-step.active .step-number {
+            background: #ff7675;
+            color: white;
+        }
+        
+        .progress-step.completed .step-number {
+            background: #00b894;
+            color: white;
+        }
+        
+        .step-label {
+            font-size: 0.9rem;
+            color: #636e72;
+            font-weight: 500;
+        }
+        
+        .progress-step.active .step-label {
+            color: #2d3436;
+            font-weight: 600;
+        }
+        
+        .checkout-content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 2rem;
+        }
+        
+        .checkout-form {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .checkout-section {
+            margin-bottom: 2.5rem;
+        }
+        
+        .section-title {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #f1f1f1;
+            color: #2d3436;
+        }
+        
+        .saved-addresses {
+            display: grid;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .address-card {
+            border: 2px solid #dfe6e9;
+            border-radius: 12px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .address-card:hover {
+            border-color: #ff7675;
+        }
+        
+        .address-card.selected {
+            border-color: #ff7675;
+            background: rgba(255, 118, 117, 0.05);
+        }
+        
+        .address-radio {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+        }
+        
+        .address-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+        
+        .address-name {
+            font-weight: 600;
+            color: #2d3436;
+        }
+        
+        .address-type {
+            background: #f1f1f1;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #636e72;
+        }
+        
+        .address-details {
+            color: #636e72;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+        
+        .address-phone {
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .add-new-address {
+            text-align: center;
+            padding: 1.5rem;
+            border: 2px dashed #dfe6e9;
+            border-radius: 12px;
+            color: #636e72;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .add-new-address:hover {
+            border-color: #ff7675;
+            color: #ff7675;
+        }
+        
+        .new-address-form {
+            display: none;
+            padding: 1.5rem;
+            background: #f9f9f9;
+            border-radius: 12px;
+            margin-top: 1.5rem;
+        }
+        
+        .new-address-form.active {
+            display: block;
+        }
+        
+        .shipping-methods {
+            display: grid;
+            gap: 1rem;
+        }
+        
+        .shipping-method {
+            display: flex;
+            align-items: center;
+            padding: 1.5rem;
+            border: 2px solid #dfe6e9;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .shipping-method:hover {
+            border-color: #ff7675;
+        }
+        
+        .shipping-method.selected {
+            border-color: #ff7675;
+            background: rgba(255, 118, 117, 0.05);
+        }
+        
+        .shipping-radio {
+            margin-right: 1rem;
+        }
+        
+        .shipping-details {
+            flex: 1;
+        }
+        
+        .shipping-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .shipping-time {
+            font-size: 0.9rem;
+            color: #636e72;
+        }
+        
+        .shipping-price {
+            font-weight: 600;
+            color: #2d3436;
+        }
+        
+        .contact-info {
+            background: #f9f9f9;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .contact-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .contact-icon {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            color: #ff7675;
+        }
+        
+        .contact-details h4 {
+            margin-bottom: 0.25rem;
+            color: #2d3436;
+        }
+        
+        .contact-details p {
+            color: #636e72;
+            font-size: 0.9rem;
+        }
+        
+        .edit-contact {
+            color: #ff7675;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .order-summary {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 2rem;
+        }
+        
+        .summary-items {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 1.5rem;
+        }
+        
+        .summary-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #f1f1f1;
+        }
+        
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+        
+        .item-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-right: 1rem;
+        }
+        
+        .item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .item-details {
+            flex: 1;
+        }
+        
+        .item-name {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+            font-size: 0.95rem;
+        }
+        
+        .item-price {
+            font-weight: 600;
+            color: #2d3436;
+        }
+        
+        .item-quantity {
+            color: #636e72;
+            font-size: 0.9rem;
+        }
+        
+        .summary-totals {
+            border-top: 2px solid #f1f1f1;
+            padding-top: 1.5rem;
+        }
+        
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            color: #636e72;
+        }
+        
+        .total-row.grand-total {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2d3436;
+            border-top: 1px solid #f1f1f1;
+            padding-top: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .checkout-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #f1f1f1;
+        }
+        
+        @media (max-width: 768px) {
+            .checkout-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .checkout-progress {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+            
+            .progress-step {
+                flex: none;
+                width: calc(50% - 1rem);
+            }
+        }
+        
+            
+    </style>
+{% endblock main %}

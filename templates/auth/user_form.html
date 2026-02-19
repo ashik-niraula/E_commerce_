@@ -1,0 +1,49 @@
+{% extends "auth/login.html" %}
+    {% block title %} Add Address {% endblock title %}
+    {% block welcome %}
+        <h1>Welcome,{{request.user.username}}</h1>
+            <p>Let We know More about you</p>
+    {% endblock welcome %}
+
+    {% block form %}
+    
+        <form id="loginForm" method = "POST">
+            {% csrf_token %}
+            <!-- Email Field -->
+            {% for field in form %}
+                <!-- Password Field -->
+                <div class="form-group">
+                    <label for="{{field.label}}"> {{field.label}} </label>
+                    <div class=" {{field.label}}-input">
+                        {{field}}
+                    </div>
+                </div>
+                    {% if field.errors %}
+                        <div class="alert alert-danger" role="alert" id="passwordError">
+                            {{ field.errors }}
+                        </div>
+                    {% endif %}
+            {% endfor %}  
+            {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger" role="alert">
+                            {{message}}
+                            </div>
+                    {% endfor %} 
+                {% endif %}        
+            <label>
+                <input type="checkbox" id="acceptTerms" required>
+                I agree to the <a href="" style="color: #ff7675;">Terms and Conditions</a> and <a href="privacy.html" style="color: #ff7675;">Privacy Policy</a>
+            </label>
+            <button type="submit" class="auth-btn">Sumbit</button>                                
+
+        </form>
+
+    {% endblock form %}
+    
+    {% block sociallogin %}{% endblock sociallogin %}
+
+     {% block account %}
+       
+    {% endblock account %}
+    

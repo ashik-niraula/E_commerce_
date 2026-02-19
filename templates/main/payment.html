@@ -1,0 +1,733 @@
+{% extends "main/base.html" %}
+{% load static %}
+{% block main %}
+    <style>
+        .checkout-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .checkout-progress {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+        
+        .checkout-progress::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #dfe6e9;
+            z-index: 1;
+        }
+        
+        .progress-step {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            flex: 1;
+        }
+        
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #dfe6e9;
+            color: #636e72;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .progress-step.active .step-number {
+            background: #ff7675;
+            color: white;
+        }
+        
+        .progress-step.completed .step-number {
+            background: #00b894;
+            color: white;
+        }
+        
+        .step-label {
+            font-size: 0.9rem;
+            color: #636e72;
+            font-weight: 500;
+        }
+        
+        .progress-step.active .step-label {
+            color: #2d3436;
+            font-weight: 600;
+        }
+        
+        .checkout-content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 2rem;
+        }
+        
+        .checkout-form {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .checkout-section {
+            margin-bottom: 2.5rem;
+        }
+        
+        .section-title {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #f1f1f1;
+            color: #2d3436;
+        }
+        
+        .payment-methods {
+            display: grid;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .payment-method {
+            border: 2px solid #dfe6e9;
+            border-radius: 12px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .payment-method:hover {
+            border-color: #ff7675;
+        }
+        
+        .payment-method.selected {
+            border-color: #ff7675;
+            background: rgba(255, 118, 117, 0.05);
+        }
+        
+        .payment-radio {
+            position: absolute;
+            right: 1rem;
+            top: 1.5rem;
+        }
+        
+        .payment-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .payment-icon {
+            width: 40px;
+            height: 40px;
+            background: #f1f1f1;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            color: #2d3436;
+        }
+        
+        .payment-name {
+            font-weight: 600;
+            color: #2d3436;
+        }
+        
+        .payment-description {
+            color: #636e72;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .card-form {
+            padding: 1.5rem;
+            background: #f9f9f9;
+            border-radius: 12px;
+            margin-top: 1.5rem;
+        }
+        
+        .card-preview {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #2d3436 0%, #636e72 100%);
+            border-radius: 12px;
+            color: white;
+        }
+        
+        .card-type {
+            font-size: 1.5rem;
+        }
+        
+        .card-number {
+            font-family: monospace;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+        }
+        
+        .card-details {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .card-expiry, .card-cvc {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2d3436;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #dfe6e9;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #ff7675;
+            box-shadow: 0 0 0 3px rgba(255, 118, 117, 0.1);
+        }
+        
+        .saved-cards {
+            display: grid;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .saved-card {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border: 2px solid #dfe6e9;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .saved-card:hover {
+            border-color: #ff7675;
+        }
+        
+        .saved-card.selected {
+            border-color: #ff7675;
+            background: rgba(255, 118, 117, 0.05);
+        }
+        
+        .card-radio {
+            margin-right: 1rem;
+        }
+        
+        .card-info {
+            flex: 1;
+        }
+        
+        .card-brand {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .card-number-masked {
+            font-family: monospace;
+            letter-spacing: 1px;
+            color: #636e72;
+        }
+        
+        .card-expiry-masked {
+            font-size: 0.9rem;
+            color: #636e72;
+        }
+        
+        .order-summary {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 2rem;
+        }
+        
+        .summary-items {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 1.5rem;
+        }
+        
+        .summary-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #f1f1f1;
+        }
+        
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+        
+        .item-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-right: 1rem;
+        }
+        
+        .item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .item-details {
+            flex: 1;
+        }
+        
+        .item-name {
+            color: #2d3436;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+            font-size: 0.95rem;
+        }
+        
+        .item-price {
+            font-weight: 600;
+            color: #2d3436;
+        }
+        
+        .item-quantity {
+            color: #636e72;
+            font-size: 0.9rem;
+        }
+        
+        .summary-totals {
+            border-top: 2px solid #f1f1f1;
+            padding-top: 1.5rem;
+        }
+        
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            color: #636e72;
+        }
+        
+        .total-row.grand-total {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2d3436;
+            border-top: 1px solid #f1f1f1;
+            padding-top: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .checkout-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #f1f1f1;
+        }
+        
+        .secure-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #00b894;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .checkout-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .checkout-progress {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+            
+            .progress-step {
+                flex: none;
+                width: calc(50% - 1rem);
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+    </style>
+
+    <!-- Main Content -->
+    <main class="section">
+        <div class="container">
+            <div class="checkout-container">
+                <!-- Checkout Progress -->
+                <div class="checkout-progress">
+                    <div class="progress-step completed">
+                        <div class="step-number">1</div>
+                        <div class="step-label">Cart</div>
+                    </div>
+                    <div class="progress-step completed">
+                        <a href="{% url "cheakout" order.id %}">
+                        <div class="step-number">2</div>
+                        <div class="step-label">Cheakout</div>
+                        </a>
+                    </div>
+                    <div class="progress-step active">
+                        <div class="step-number">3</div>
+                        <div class="step-label">Payment</div>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-number">4</div>
+                        <div class="step-label">Confirmation</div>
+                    </div>
+                </div>
+                
+                <div class="checkout-content">
+                    <!-- Left Column - Payment Forms -->
+                    <div class="checkout-forms">
+                        <div class="checkout-form">
+                            <!-- Payment Methods Section -->
+                            <div class="checkout-section">
+                                <h2 class="section-title">Payment Method</h2>  
+                                <div class="payment-methods">
+                                    <!-- Credit/Debit Card -->
+                                      {% if messages %}
+                                    {% for message in messages %}
+                                    <div class="alert alert-danger" role="alert">
+                                        {{message}}
+                                        </div>
+                                {% endfor %} 
+                                {% endif %} 
+                                    <form method="POST">
+                                        {% csrf_token %}
+                                    <div class="payment-method">
+                                        <div class="payment-radio">
+                                            <input type="radio" name="method" value='esewa'>
+                                        </div>
+                                        <div class="payment-header">
+                                            <div class="payment-icon">
+                                               <img src="{% static "images/icon.jpeg" %}" alt="eSewa Payment" style="width:50px;height:auto;">
+                                            </div>
+                                            <div class="payment-name">Esewa</div>
+                                        </div>
+                                        <div class="payment-description">
+                                            Pay quickly and securely with your Esewa account.
+                                        </div>
+                                        
+                                    </div>
+                                    <!-- PayPal -->
+                                   <div class="payment-method">
+                                       <div class="payment-radio">
+                                           <input type="radio" name="method" value='paypal'>
+                                       </div>
+                                       <div class="payment-header">
+                                           <div class="payment-icon">
+                                               <i class="fab fa-paypal"></i>
+                                           </div>
+                                           <div class="payment-name">PayPal</div>
+                                       </div>
+                                       <div class="payment-description">
+                                           Pay quickly and securely with your PayPal account.
+                                       </div>
+                                   </div>
+                                     {% comment %}
+                                    <div class="payment-method selected" onclick="selectPaymentMethod('card')">
+                                        <div class="payment-radio">
+                                            <input type="radio" name="payment" checked>
+                                        </div>
+                                        <div class="payment-header">
+                                            <div class="payment-icon">
+                                                <i class="far fa-credit-card"></i>
+                                            </div>
+                                            <div class="payment-name">Credit/Debit Card</div>
+                                        </div>
+                                        <div class="payment-description">
+                                            Pay securely with your Visa, MasterCard, or American Express card.
+                                        </div>
+                                    </div>
+                                    
+                                    
+                                    <!-- Apple Pay -->
+                                    <div class="payment-method" onclick="selectPaymentMethod('applepay')">
+                                        <div class="payment-radio">
+                                            <input type="radio" name="payment">
+                                        </div>
+                                        <div class="payment-header">
+                                            <div class="payment-icon">
+                                                <i class="fab fa-apple"></i>
+                                            </div>
+                                            <div class="payment-name">Apple Pay</div>
+                                        </div>
+                                        <div class="payment-description">
+                                            Pay with Apple Pay for a fast, secure checkout.
+                                        </div>
+                                    </div> {% endcomment %}
+                                </div>
+                                
+                                {% comment %} <!-- Card Form -->
+                                <div class="card-form" id="cardForm">
+                                    <div class="secure-badge">
+                                        <i class="fas fa-lock"></i> Secure payment encrypted
+                                    </div>
+                                    
+                                    <!-- Saved Cards -->
+                                    <div class="saved-cards">
+                                        <div class="saved-card selected" onclick="selectSavedCard(1)">
+                                            <div class="card-radio">
+                                                <input type="radio" name="savedCard" checked>
+                                            </div>
+                                            <div class="card-info">
+                                                <div class="card-brand">Visa ending in 4242</div>
+                                                <div class="card-number-masked">•••• •••• •••• 4242</div>
+                                                <div class="card-expiry-masked">Expires 12/25</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="saved-card" onclick="selectSavedCard(2)">
+                                            <div class="card-radio">
+                                                <input type="radio" name="savedCard">
+                                            </div>
+                                            <div class="card-info">
+                                                <div class="card-brand">MasterCard ending in 8888</div>
+                                                <div class="card-number-masked">•••• •••• •••• 8888</div>
+                                                <div class="card-expiry-masked">Expires 08/26</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div style="text-align: center; margin: 1rem 0;">
+                                        <button class="btn btn-outline" onclick="showNewCardForm()">
+                                            <i class="fas fa-plus"></i> Use New Card
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- New Card Form -->
+                                    <div id="newCardForm" style="display: none;">
+                                        <div class="card-preview">
+                                            <div class="card-type">
+                                                <i class="far fa-credit-card"></i>
+                                            </div>
+                                            <div class="card-number" id="previewCardNumber">•••• •••• •••• ••••</div>
+                                            <div class="card-details">
+                                                <div class="card-expiry" id="previewExpiry">MM/YY</div>
+                                                <div class="card-cvc" id="previewCVC">CVC</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label>Card Number</label>
+                                            <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCardNumber()">
+                                        </div>
+                                        
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <label>Expiration Date</label>
+                                                <input type="text" id="expiryDate" placeholder="MM/YY" maxlength="5" oninput="formatExpiryDate()">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Security Code (CVC)</label>
+                                                <input type="text" id="cvcCode" placeholder="123" maxlength="3" oninput="formatCVC()">
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label>Cardholder Name</label>
+                                            <input type="text" id="cardholderName" placeholder="John Doe">
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label>
+                                                <input type="checkbox" id="saveCard"> Save this card for future purchases
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div> {% endcomment %}
+                                
+                                <!-- PayPal Instructions -->
+                                <div class="card-form" id="paypalForm" style="display: none;">
+                                    <p>You will be redirected to PayPal to complete your payment securely.</p>
+                                    <div style="text-align: center; margin-top: 1rem;">
+                                        <button class="btn btn-primary" style="background: #003087; color: white;">
+                                            <i class="fab fa-paypal"></i> Continue with PayPal
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Apple Pay Instructions -->
+                                <div class="card-form" id="applePayForm" style="display: none;">
+                                    <p>Click the button below to pay with Apple Pay.</p>
+                                    <div style="text-align: center; margin-top: 1rem;">
+                                        <button class="btn btn-primary" style="background: #000; color: white;">
+                                            <i class="fab fa-apple"></i> Pay with Apple Pay
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {% comment %} <!-- Billing Address Section -->
+                            <div class="checkout-section">
+                                <h2 class="section-title">Billing Address</h2>
+                                
+                                <div class="form-group">
+                                    <label>
+                                        <input type="checkbox" id="sameAsShipping" checked>
+                                        Same as shipping address
+                                    </label>
+                                </div>
+                                
+                                <div id="billingAddressForm" style="display: none; margin-top: 1rem;">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>First Name</label>
+                                            <input type="text" value="John">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Last Name</label>
+                                            <input type="text" value="Doe">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>Address</label>
+                                        <input type="text" value="123 Main Street">
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>City</label>
+                                            <input type="text" value="New York">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>ZIP Code</label>
+                                            <input type="text" value="10001">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>Country</label>
+                                        <select>
+                                            <option selected>United States</option>
+                                            <option>Canada</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div> {% endcomment %}
+                            
+                            {% comment %} <!-- Order Notes -->
+                            <div class="checkout-section">
+                                <h2 class="section-title">Order Notes (Optional)</h2>
+                                <textarea placeholder="Add special instructions for your order..." rows="3" style="width: 100%; padding: 1rem; border: 1px solid #dfe6e9; border-radius: 8px; font-family: 'Inter', sans-serif;"></textarea>
+                            </div> {% endcomment %}
+                            
+                            <!-- Terms and Conditions -->
+                            <div class="checkout-section">
+                                <div class="form-group">
+                                    <label>
+                                        <input type="checkbox" id="acceptTerms" required>
+                                        I agree to the <a href="" style="color: #ff7675;">Terms and Conditions</a> and <a href="privacy.html" style="color: #ff7675;">Privacy Policy</a>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Navigation -->
+                            <div class="checkout-actions">
+                                <a href="{% url "cheakout" order.id %}" class="btn btn-outline">
+                                    <i class="fas fa-arrow-left"></i> Back to Cheakout
+                                </a>
+                                <button type='submit' class="btn btn-primary">
+                                    Complete Order <i class="fas fa-check"></i>
+                                </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Column - Order Summary -->
+                    <div class="order-summary">
+                        <h3 style="margin-bottom: 1.5rem;">Order Summary</h3>
+                        
+                        <div class="summary-items">
+                            <!-- Item 1 -->
+                             {% for item in orderitem %}
+                            <div class="summary-item">
+                                <div class="item-image">
+                                    <img src="{{item.product.get_image_url}}" alt="Smart Watch">
+                                </div>
+                                <div class="item-details">
+                                    <div class="item-name"> {{item.product.name}} </div>
+                                    <div class="item-price">${{item.product.price}} </div>
+                                    <div class="item-quantity">Qty:  {{item.quantity}} </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        <div class="summary-totals">
+                            <div class="total-row">
+                                <span>Subtotal</span>
+                                <span> ${{sub_total}} </span>
+                            </div>
+                            <div class="total-row">
+                                <span> {{order.shipping_price.shipping_type|upper}} </span>
+                                <span> ${{order.shipping_price.price}} </span>
+                            </div>
+                           
+                            <div class="total-row grand-total">
+                                <span>Total</span>
+                                <span>${{order.total_amount}} </span>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 1.5rem; padding: 1rem; background: #f9f9f9; border-radius: 8px;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                <i class="fas fa-shipping-fast" style="color: #ff7675;"></i>
+                                <span style="font-weight: 500;">Shipping to: John Doe</span>
+                            </div>
+                            <p style="font-size: 0.9rem; color: #636e72;">
+                                 {{order.address.address}} <br>
+                                 {{order.address.state}} <br>
+                                {{order.address.country}}
+                            </p>
+                            <a href="{% url "cheakout" order.id %}" style="color: #ff7675; font-size: 0.9rem;">Edit address</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock main %}
+  
+   

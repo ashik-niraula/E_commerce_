@@ -1,0 +1,185 @@
+{% extends "main/base.html" %}
+
+{% block main %}  <main>
+        <!-- Hero Section -->
+        <section class="hero section">
+            <div class="container">
+                <div class="hero-slider">
+                    <!-- Slide 1 -->
+                     {% for slider in sliders %}
+                    <div class="slide {% if slider.first %} active {% endif %}" loading="lazy" style="background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('{{slider.get_image_url}}');">
+                        <div class="slide-content">
+                            <h1> {{slider.title}} </h1>
+                            <p> {{slider.sub_title}} Limited time offer!</p>
+                            <a href="/products/?category={{slider.category.name}}" class="btn btn-primary">Shop Now <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <!-- Slider Controls -->
+                    <div class="slider-controls">
+                        <button class="slider-dot active"></button>
+                        <button class="slider-dot"></button>
+                        <button class="slider-dot"></button>
+                    </div>
+                </div>
+                
+                <!-- Category Grid -->
+                <div class="categories">
+                    {% for category in categories %}
+                    <a href="products/?category={{category.name}}" class="category-card">
+                        <img src="{{category.get_image_url}}" loading="lazy" alt="Electronics">
+                        <div class="category-content">
+                            <h3> {{category.name}} </h3>
+                            
+                        </div>
+                    </a>
+                  {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        <!-- Featured Products -->
+        <section class="section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Featured Products</h2>
+                    <a href="{% url "products" %}" class="btn btn-outline">View All <i class="fas fa-arrow-right"></i></a>
+                </div>
+                
+                <div class="product-grid">
+                    <!-- Product 1 -->
+                     {% for product in featured %}
+                    <div class="product-card">
+                        <div class="product-badges">
+                            {% if product.pip %}
+                            <span class="badge badge-new"> {{product.pip}} </span>
+                            {% endif %}
+                            {% if product.previous_price %}
+                            <span class="badge badge-sale">-20%</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="quick-actions">
+                            <button class="btn btn-icon btn-outline quick-view" data-product-id="1">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-icon btn-outline add-to-wishlist" data-product-id="1">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                        <a href="{% url "product_detail" product.slug %}">
+                        <div class="product-image">
+                            {% if product.get_image_url %}
+                            <img src="{{product.get_image_url}}"  width="300" height="300" loading="lazy" alt="{{product.name}}">
+                             {% endif %}
+                        </div>
+                        
+                        <div class="product-info">
+                            <h3 class="product-title"> {{product.name}} </h3>
+                            <div class="product-price">
+                                <span class="current-price">${{product.price}} </span>
+                                <span class="original-price">${{product.previous_price}} </span>
+                            </div>
+                            </a>
+                            <div class="product-rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                                <span class="rating-count">(128)</span>
+                            </div>
+                             {% if product.id in user_cart %}
+                           <button class="btn btn-success add-to-cart" data-product-id="{{ product.id }}">
+                                <i class="fas fa-shopping-cart"></i> Added
+                            </button>
+                        {% else %}
+                            <button class="btn btn-primary add-to-cart" data-product-id="{{ product.id }}">
+                                <i class="fas fa-shopping-cart"></i> Add to Cart
+                            </button>
+                         {% endif %} 
+                         <button onclick="window.location.href='{% url "buynow" product.slug %}'" class="btn btn-secondary" style="flex: 1;">
+                            <i class="fas fa-bolt"></i> Buy Now
+                        </button>   
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+
+        <!-- Promotional Banner -->
+        <section class="section">
+            <div class="container">
+                <div class="promo-banner" style="background: linear-gradient(135deg, #2d3436 0%, #636e72 100%); border-radius: var(--radius-lg); padding: var(--space-xl); color: white;">
+                    <div class="promo-content" style="display: flex; align-items: center; justify-content: space-between;">
+                        <div>
+                            <h2 style="color: white;">Black Friday Sale!</h2>
+                            <p style="margin-bottom: var(--space-md);">Up to 70% off on selected items. Limited time offer.</p>
+                            <div class="countdown" style="display: flex; gap: var(--space-md); margin-bottom: var(--space-lg);">
+                                <div class="countdown-item">
+                                    <div class="countdown-value" style="font-size: 2rem; font-weight: 700;">05</div>
+                                    <div class="countdown-label">Days</div>
+                                </div>
+                                <div class="countdown-item">
+                                    <div class="countdown-value" style="font-size: 2rem; font-weight: 700;">12</div>
+                                    <div class="countdown-label">Hours</div>
+                                </div>
+                                <div class="countdown-item">
+                                    <div class="countdown-value" style="font-size: 2rem; font-weight: 700;">45</div>
+                                    <div class="countdown-label">Minutes</div>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="products.html?promo=blackfriday" class="btn btn-primary" style="background-color: white; color: #2d3436;">Shop Sale <i class="fas fa-bolt"></i></a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <!-- Live Chat Widget -->
+    <div class="chat-widget">
+        <button class="chat-toggle btn btn-primary">
+            <i class="fas fa-comment"></i>
+        </button>
+        <div class="chat-container" style="display: none;">
+            <!-- Chat content would go here -->
+        </div>
+    </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+    const slides = document.querySelectorAll(".hero-slider .slide");
+    const dots = document.querySelectorAll(".hero-slider .slider-dot");
+
+    let index = 0;
+
+    function activateSlide(i) {
+        slides.forEach((slide, n) => {
+            slide.classList.remove("active");
+            dots[n].classList.remove("active");
+        });
+
+        slides[i].classList.add("active");
+        dots[i].classList.add("active");
+        index = i;
+    }
+
+    // Auto play
+    setInterval(function () {
+        let next = (index + 1) % slides.length;
+        activateSlide(next);
+    }, 3000);
+
+    // Dot click
+    dots.forEach((dot, i) => {
+        dot.addEventListener("click", function () {
+            activateSlide(i);
+        });
+    });
+
+});
+</script>
+{% endblock main %}
+   

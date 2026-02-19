@@ -1,0 +1,68 @@
+{% extends "auth/login.html" %}
+    {% block title %}Signup{% endblock title %}
+    {% block welcome %}
+        <h1>Welcome</h1>
+            <p>Sign up to your New account to continue shopping</p>
+    {% endblock welcome %}
+
+    {% block form %}
+    
+        <form id="loginForm" method = "POST">
+            {% csrf_token %}
+            <!-- Email Field -->
+            {% for field in form %}
+                <!-- Password Field -->
+                <div class="form-group">
+                    <label for="{{field.label}}"> {{field.label}} </label>
+                    <div class=" {{field.label}}-input">
+                        {{field}}
+                        {% if field.label == 'Password' %}
+                        <button type="button" class="toggle-password" id="togglePassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+                    {% if field.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ field.errors }}
+                        </div>
+                    {% endif %}
+            {% endfor %}  
+            {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger" role="alert">
+                            {{message}}
+                            </div>
+                    {% endfor %} 
+                {% endif %}
+                <div>
+                    <input type="radio" id="option1" name="role" value="customer" checked>
+                    <label for="option1">
+                        <i style="color: #ff7675;">Customer</i>
+                    </label>
+                </div>
+
+                {% comment %} <div>
+                    <input type="radio" id="option2" name="role" value="vendor">
+                    <label for="option2">
+                        <i style="color: #ff7675;">Vendor</i>
+                    </label>
+                </div> {% endcomment %}
+       
+            <label>
+                <input type="checkbox" id="acceptTerms" required>
+                I agree to the <a href="" style="color: #ff7675;">Terms and Conditions</a> and <a href="" style="color: #ff7675;">Privacy Policy</a>
+            </label>
+            <button type="submit" class="auth-btn">Sign In</button>                                
+
+        </form>
+
+    {% endblock form %}
+                        
+
+     {% block account %}
+        <div class="auth-footer">
+            Already have an account? <a href="{% url "login" %}">Login Here</a>
+        </div>
+    {% endblock account %}

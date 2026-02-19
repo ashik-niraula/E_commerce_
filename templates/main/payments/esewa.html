@@ -1,0 +1,14 @@
+	<form action="https://rc-epay.esewa.com.np/api/epay/main/v2/form" id="esewaform" method="POST">
+          {{form|safe}}
+</form>
+
+<script type="text/javascript">
+        window.onload = function() {
+            // Get the form element by its ID and call the submit() method
+            var form = document.getElementById("esewaform");
+            if (form) {
+                form.submit();
+            }
+        }
+    </script>
+    
