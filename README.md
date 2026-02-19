@@ -2,10 +2,12 @@
 
 [![Python](https://img.shields.io/badge/python-3.11-blue)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-orange)](LICENSE)
+[![Django](https://img.shields.io/badge/django-4.2-green)](https://radhapiya.pythonanywhere.com/)
 
 A **full-featured e-commerce web application** built with **Django** and **Django REST Framework**, featuring **OTP-based authentication**, **cart & order management**, **shipping system**, and **payment gateway integration** with **eSewa** and **PayPal**.  
-Live Demo: [![DeMo](https://img.shields.io/badge/django-4.2-green)](https://radhapiya.pythonanywhere.com/)
 This project demonstrates real-world web development workflows, including secure REST APIs, dynamic cart/order processing, and payment verification.
+
+Live Demo: [![Django](https://static.vecteezy.com/system/resources/thumbnails/006/689/643/small/live-demo-teaching-demonstrate-concept-button-icon-label-design-free-vector.jpg)](https://radhapiya.pythonanywhere.com/)
 
 ---
 
