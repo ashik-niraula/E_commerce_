@@ -1,11 +1,10 @@
 # 🛒 Django E-Commerce Platform
 
 [![Python](https://img.shields.io/badge/python-3.11-blue)](https://www.python.org/)
-[![Django](https://img.shields.io/badge/django-4.2-green)](https://www.djangoproject.com/)
 [![License](https://img.shields.io/badge/license-MIT-orange)](LICENSE)
 
 A **full-featured e-commerce web application** built with **Django** and **Django REST Framework**, featuring **OTP-based authentication**, **cart & order management**, **shipping system**, and **payment gateway integration** with **eSewa** and **PayPal**.  
-
+Live Demo: [![DeMo](https://img.shields.io/badge/django-4.2-green)](https://radhapiya.pythonanywhere.com/)
 This project demonstrates real-world web development workflows, including secure REST APIs, dynamic cart/order processing, and payment verification.
 
 ---
